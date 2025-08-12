@@ -65,7 +65,7 @@ async function seed() {
         _id: new mongoose.Types.ObjectId("64f49391b5a4c9a4a1a45f11"),
         title: "Shakshuka",
         difficulty: "Easy",
-        category: "Breakfast",
+        category: "Main Dish",
         description:
           "A hearty North African–Israeli dish of poached eggs cooked in a spiced tomato and pepper sauce.",
         instructions: [
@@ -114,7 +114,7 @@ async function seed() {
         _id: new mongoose.Types.ObjectId("64f49391b5a4c9a4a1a45f13"),
         title: "Mediterranean Salad",
         difficulty: "Easy",
-        category: "Starter",
+        category: "Starters",
         description:
           "A refreshing salad with cucumbers, tomatoes, feta and olives.",
         instructions: [
@@ -136,8 +136,8 @@ async function seed() {
       {
         _id: new mongoose.Types.ObjectId("64f49391b5a4c9a4a1a45f14"),
         title: "Falafel in Pita",
-        difficulty: "Medium",
-        category: "Main",
+        difficulty: "Intermediate",
+        category: "Main Dish",
         description:
           "Classic Israeli street food featuring crispy falafel balls stuffed in pita with salad and tahini.",
         instructions: [
@@ -168,7 +168,7 @@ async function seed() {
         _id: new mongoose.Types.ObjectId("64f49391b5a4c9a4a1a45f15"),
         title: "Israeli Couscous Salad",
         difficulty: "Easy",
-        category: "Side",
+        category: "Appetizers",
         description:
           "Toasted pearl couscous tossed with fresh vegetables and herbs in a lemony dressing.",
         instructions: [
@@ -196,7 +196,7 @@ async function seed() {
         _id: new mongoose.Types.ObjectId("64f49391b5a4c9a4a1a45f16"),
         title: "Hummus",
         difficulty: "Easy",
-        category: "Appetizer",
+        category: "Appetizers",
         description:
           "Creamy blended dip made from chickpeas, tahini, lemon, and garlic.",
         instructions: [
@@ -222,8 +222,8 @@ async function seed() {
       {
         _id: new mongoose.Types.ObjectId("64f49391b5a4c9a4a1a45f17"),
         title: "Sabich",
-        difficulty: "Medium",
-        category: "Main",
+        difficulty: "Intermediate",
+        category: "Main Dish",
         description:
           "Iraqi-Israeli pita sandwich stuffed with fried eggplant, hard-boiled eggs, salad, and tangy amba sauce.",
         instructions: [

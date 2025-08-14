@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useUser } from "../context/UserContext";
 import {
   fetchRecipeById,
@@ -9,6 +10,7 @@ import {
 } from "../services/BackendService";
 import RecipeCard from "./RecipeCard";
 import MealCard from "./MealCard";
+import RecipeDetailsModal from "./RecipeDetailsModal";
 
 /**
  * Renders a modal for user settings.
@@ -71,80 +73,91 @@ const SettingsModal = ({
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 z-50 flex justify-center items-center">
-      <div className="bg-white dark:bg-gray-700 p-5 rounded-lg shadow-lg max-w-md w-full">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-          Settings
-        </h2>
-        <form onSubmit={handleSubmit}>
-          <div className="my-4">
-            <label
-              htmlFor="bio"
-              className="block mb-2 text-sm font-bold text-gray-700 dark:text-gray-200"
-            >
-              Bio
-            </label>
-            <textarea
-              id="bio"
-              rows="4"
-              className="w-full px-3 py-2 text-gray-700 dark:text-gray-300 border rounded-lg focus:outline-none dark:border-gray-600 dark:bg-gray-800"
-              value={bio}
-              onChange={handleBioChange}
-            />
-          </div>
-          <div className="my-4">
-            <label
-              htmlFor="theme"
-              className="block mb-2 text-sm font-bold text-gray-700 dark:text-gray-200"
-            >
-              Theme
-            </label>
-            <select
-              id="theme"
-              value={theme}
-              onChange={handleThemeChange}
-              className="w-full px-3 py-2 text-gray-700 dark:text-gray-300 border rounded-lg focus:outline-none dark:border-gray-600 dark:bg-gray-800"
-            >
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-            </select>
-          </div>
+    <>
+      <motion.div
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+      />
+      <motion.div
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        initial={{ opacity: 0, y: 20, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 20, scale: 0.98 }}
+      >
+        <div className="max-w-md w-full rounded-2xl overflow-hidden ring-1 ring-black/5 dark:ring-white/10 shadow-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur">
+          <div className="p-5">
+            <h2 className="text-2xl font-extrabold bg-gradient-to-r from-rose-500 to-fuchsia-500 bg-clip-text text-transparent">
+              Profile Settings
+            </h2>
+            <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+              <div>
+                <label htmlFor="bio" className="block mb-1 text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  Bio
+                </label>
+                <textarea
+                  id="bio"
+                  rows="4"
+                  className="w-full px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 text-gray-700 dark:text-gray-300"
+                  value={bio}
+                  onChange={handleBioChange}
+                />
+              </div>
 
-          <div className="my-4">
-            <label
-              htmlFor="profileImageUrl"
-              className="block mb-2 text-sm font-bold text-gray-700 dark:text-gray-200"
-            >
-              Profile Image URL
-            </label>
-            <input
-              type="text"
-              id="profileImageUrl"
-              className="w-full px-3 py-2 text-gray-700 dark:text-gray-300 border rounded-lg focus:outline-none dark:border-gray-600 dark:bg-gray-800"
-              value={profileImageUrl}
-              onChange={handleProfileImageUrlChange}
-              placeholder="Enter image URL"
-            />
-          </div>
+              <div>
+                <label htmlFor="theme" className="block mb-1 text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  Theme
+                </label>
+                <select
+                  id="theme"
+                  value={theme}
+                  onChange={handleThemeChange}
+                  className="w-full px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 text-gray-700 dark:text-gray-300"
+                >
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                  <option value="ocean">Ocean</option>
+                  <option value="forest">Forest</option>
+                  <option value="grape">Grape</option>
+                </select>
+              </div>
 
-          <div className="flex justify-end space-x-4">
-            <button
-              type="button"
-              className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-black dark:text-white rounded hover:bg-gray-400 dark:hover:bg-gray-500"
-              onClick={onClose}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
-            >
-              Save Changes
-            </button>
+              <div>
+                <label htmlFor="profileImageUrl" className="block mb-1 text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  Profile Image URL
+                </label>
+                <input
+                  type="text"
+                  id="profileImageUrl"
+                  className="w-full px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 text-gray-700 dark:text-gray-300"
+                  value={profileImageUrl}
+                  onChange={handleProfileImageUrlChange}
+                  placeholder="Enter image URL"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  className="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-xl bg-gray-100 dark:bg-gray-800 ring-1 ring-black/5 dark:ring-white/10 text-gray-800 dark:text-gray-200"
+                  onClick={onClose}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-emerald-500 to-teal-500 shadow hover:shadow-md transition-shadow"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+      </motion.div>
+    </>
   );
 };
 
@@ -162,7 +175,7 @@ export default function MyYummy() {
   const [favoriteRecipes, setFavoriteRecipes] = useState([]);
   const [uploadedRecipes, setUploadedRecipes] = useState([]);
   const [MealPlans, setMealPlans] = useState([]);
-  const [expandedRecipeId, setExpandedRecipeId] = useState(null);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
   const [expandedMealId, setExpandedMealId] = useState(null);
 
@@ -206,31 +219,15 @@ export default function MyYummy() {
     initFetch();
   }, [user]);
 
-  const handleRecipeClick = (id) =>
-    setExpandedRecipeId(expandedRecipeId === id ? null : id);
+  const handleRecipeOpen = (recipe) => setSelectedRecipe(recipe);
 
   const renderRecipeCards = (recipes) => (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 dark:bg-gray-900">
-      <div
-        className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ${
-          expandedRecipeId ? "lg:gap-8 xl:gap-10" : ""
-        }`}
-      >
+    <div className="max-w-6xl mx-auto px-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         {recipes.map((recipe) => (
-          <div
-            key={recipe._id}
-            className={`p-4 rounded-lg shadow-md hover:shadow-lg transition duration-300 transform hover:-translate-y-1 bg-white dark:bg-gray-800 ${
-              expandedRecipeId === recipe._id
-                ? "col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4"
-                : ""
-            }`}
-          >
-            <RecipeCard
-              recipe={recipe}
-              onClick={() => handleRecipeClick(recipe._id)}
-              isExpanded={expandedRecipeId === recipe._id}
-            />
-          </div>
+          <motion.div key={recipe._id} initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.35 }}>
+            <RecipeCard recipe={recipe} isExpanded={false} onClick={() => handleRecipeOpen(recipe)} />
+          </motion.div>
         ))}
       </div>
     </div>
@@ -241,8 +238,8 @@ export default function MyYummy() {
   };
 
   const renderMealPlans = (mealPlans) => (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 dark:bg-gray-900">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="max-w-6xl mx-auto px-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         {mealPlans.map((meal) => (
           <div
             key={meal._id}
@@ -326,70 +323,113 @@ export default function MyYummy() {
     }
   };
 
-  if (loadingStatus === "Loading") return <div>Loading... please wait</div>;
-  if (loadingStatus === "Error") return <div>Error: {error}</div>;
-
-  return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 dark:bg-gray-900">
-      <div className="flex flex-wrap -mb-4">
-        {/* Profile Section */}
-        <div className="w-full sm:w-1/2 lg:w-1/3 p-4">
-          <div className="flex flex-col items-center bg-white dark:bg-gray-800 rounded-lg shadow-xl relative">
-            <img
-              src={user.profileImageUrl || "default_profile_image_url"}
-              alt="Profile"
-              className="rounded-full h-32 w-32 md:h-48 md:w-48 object-cover shadow-lg border-4 border-blue-300 dark:border-blue-700 cursor-pointer"
-            />
-            {/* User Details */}
-            <h2 className="text-2xl md:text-3xl font-extrabold text-center mt-4 text-blue-600 dark:text-blue-400">
-              {user.name}
-            </h2>
-            <p className="text-base text-center text-gray-500 dark:text-gray-400 mt-2">
-              @{user.username}
-            </p>
-            <p className="text-center mt-4 text-lg text-gray-700 dark:text-gray-300">
-              {user.bio || "No bio available"}
-            </p>
-            <button
-              className="my-6 bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-full transition-colors duration-150 ease-in-out"
-              onClick={toggleSettingsVisibility}
-            >
-              Settings
-            </button>
-          </div>
-        </div>
-
-        {/* Recipes and Meal Plans */}
-        <div className="w-full lg:w-2/3 px-4">
-          <div className="container mx-auto px-4 py-8">
-            {/* Favorite Recipes Section */}
-            <div className="mb-8">
-              <h2 className="text-4xl font-bold mb-8">Favorite Recipes</h2>
-              {renderRecipeCards(favoriteRecipes)}
-            </div>
-
-            {/* Uploaded Recipes Section */}
-            <div className="mb-8">
-              <h2 className="text-4xl font-bold mb-8">Uploaded Recipes</h2>
-              {renderRecipeCards(uploadedRecipes)}
-            </div>
-
-            {/* Meal Plans Section */}
-            <div className="mb-8">
-              <h2 className="text-4xl font-bold mb-8">Meal Plans</h2>
-              {renderMealPlans(MealPlans)}
-            </div>
+  if (loadingStatus === "Loading")
+    return (
+      <div className="max-w-6xl mx-auto px-4 py-10">
+        <div className="animate-pulse space-y-6">
+          <div className="h-10 w-1/2 bg-gray-200 dark:bg-gray-800 rounded"></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-64 rounded-2xl bg-white/60 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10"></div>
+            ))}
           </div>
         </div>
       </div>
-      <SettingsModal
-        isVisible={isSettingsVisible}
-        onClose={toggleSettingsVisibility}
-        currentUser={user}
-        onSaveBio={onSaveBio}
-        onUpdateTheme={onUpdateTheme}
-        onUpdateProfileImage={onUpdateProfileImage}
-      />{" "}
-    </div>
+    );
+  if (loadingStatus === "Error") return <div>Error: {error}</div>;
+
+  // Stats
+  const favCount = favoriteRecipes.length;
+  const upCount = uploadedRecipes.length;
+  const planCount = MealPlans.length;
+
+  return (
+    <section className="relative">
+  <div className="absolute inset-0 page-gradient -z-10" />
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+          {/* Profile Card */}
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-6">
+            <div className="flex flex-col items-center text-center">
+              <div className="relative">
+                <img
+                  src={user.profileImageUrl || "https://via.placeholder.com/150"}
+                  alt="Profile"
+                  className="rounded-full h-28 w-28 md:h-36 md:w-36 object-cover shadow ring-2 ring-rose-300/50"
+                />
+                <button onClick={toggleSettingsVisibility} className="absolute -bottom-2 right-0 px-3 py-1.5 text-xs font-semibold rounded-full text-white bg-gradient-to-r from-rose-500 to-fuchsia-500 shadow ring-1 ring-black/5 dark:ring-white/10">
+                  Edit
+                </button>
+              </div>
+              <h2 className="text-2xl font-extrabold mt-4 accent-text">{user.name}</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400">@{user.username}</p>
+              <p className="text-sm text-gray-700 dark:text-gray-300 mt-3 max-w-md">{user.bio || "No bio available"}</p>
+              <div className="mt-5 grid grid-cols-3 gap-3 w-full">
+                <div className="rounded-xl bg-gray-100 dark:bg-gray-800 p-3 text-center ring-1 ring-black/5 dark:ring-white/10">
+                  <div className="text-xl font-bold text-gray-900 dark:text-gray-100">{favCount}</div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">Favorites</div>
+                </div>
+                <div className="rounded-xl bg-gray-100 dark:bg-gray-800 p-3 text-center ring-1 ring-black/5 dark:ring-white/10">
+                  <div className="text-xl font-bold text-gray-900 dark:text-gray-100">{upCount}</div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">Uploads</div>
+                </div>
+                <div className="rounded-xl bg-gray-100 dark:bg-gray-800 p-3 text-center ring-1 ring-black/5 dark:ring-white/10">
+                  <div className="text-xl font-bold text-gray-900 dark:text-gray-100">{planCount}</div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">Plans</div>
+                </div>
+              </div>
+              <button
+                className="mt-5 inline-flex items-center justify-center px-5 py-2 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-emerald-500 to-teal-500 shadow hover:shadow-md transition-shadow"
+                onClick={toggleSettingsVisibility}
+              >
+                Settings
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Content */}
+          <div className="lg:col-span-2 space-y-8">
+            <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }} className="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-5">
+              <h3 className="text-xl md:text-2xl font-bold mb-4 accent-text">Favorite Recipes</h3>
+              {renderRecipeCards(favoriteRecipes)}
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }} className="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-5">
+              <h3 className="text-xl md:text-2xl font-bold mb-4 accent-text">Uploaded Recipes</h3>
+              {renderRecipeCards(uploadedRecipes)}
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }} className="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-5">
+              <h3 className="text-xl md:text-2xl font-bold mb-4 accent-text">Meal Plans</h3>
+              {renderMealPlans(MealPlans)}
+            </motion.div>
+          </div>
+        </div>
+
+        <AnimatePresence>
+          {selectedRecipe && (
+            <RecipeDetailsModal
+              key={selectedRecipe._id}
+              recipe={selectedRecipe}
+              onClose={() => setSelectedRecipe(null)}
+              showSelectButton={false}
+            />
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {isSettingsVisible && (
+            <SettingsModal
+              isVisible={isSettingsVisible}
+              onClose={toggleSettingsVisibility}
+              currentUser={user}
+              onSaveBio={onSaveBio}
+              onUpdateTheme={onUpdateTheme}
+              onUpdateProfileImage={onUpdateProfileImage}
+            />
+          )}
+        </AnimatePresence>
+      </div>
+    </section>
   );
 }

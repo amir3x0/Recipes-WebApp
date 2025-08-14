@@ -1,3 +1,62 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Theme variables */
+:root,
+.theme-light {
+	--accent-from: #f43f5e; /* rose-500 */
+	--accent-to: #a21caf;   /* fuchsia-700 */
+	--page-grad-from: #fff1f2; /* rose-50 */
+	--page-grad-via: #ffffff;
+	--page-grad-to: #fffbeb;   /* amber-50 */
+}
+
+.theme-dark {
+	--accent-from: #60a5fa; /* blue-400 */
+	--accent-to: #22d3ee;   /* cyan-400 */
+	--page-grad-from: #0b1020;
+	--page-grad-via: #0a0f1a;
+	--page-grad-to: #000000;
+}
+
+.theme-ocean {
+	--accent-from: #06b6d4; /* cyan-500 */
+	--accent-to: #3b82f6;   /* blue-500 */
+	--page-grad-from: #ecfeff; /* cyan-50 */
+	--page-grad-via: #eff6ff;  /* blue-50 */
+	--page-grad-to: #ffffff;
+}
+
+.theme-forest {
+	--accent-from: #10b981; /* emerald-500 */
+	--accent-to: #84cc16;   /* lime-500 */
+	--page-grad-from: #ecfdf5; /* emerald-50 */
+	--page-grad-via: #f7fee7;  /* lime-50 */
+	--page-grad-to: #ffffff;
+}
+
+.theme-grape {
+	--accent-from: #a78bfa; /* violet-400 */
+	--accent-to: #f472b6;   /* pink-400 */
+	--page-grad-from: #faf5ff; /* violet-50 */
+	--page-grad-via: #fdf2f8;  /* pink-50 */
+	--page-grad-to: #ffffff;
+}
+
+/* Utilities relying on variables */
+.page-gradient {
+	background-image: linear-gradient(
+		to bottom,
+		var(--page-grad-from),
+		var(--page-grad-via),
+		var(--page-grad-to)
+	);
+}
+
+.accent-text {
+	background-image: linear-gradient(to right, var(--accent-from), var(--accent-to));
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}

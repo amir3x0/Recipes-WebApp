@@ -52,7 +52,7 @@ const MealCard = ({ meal, onExpandChange }) => {
   };
 
   return (
-    <motion.div
+  <motion.div
       whileHover={{ y: -3 }}
       onClick={toggleExpand}
       className={`rounded-2xl overflow-hidden ring-1 ring-black/5 dark:ring-white/10 shadow-xl bg-white/70 dark:bg-gray-900/60 backdrop-blur cursor-pointer ${

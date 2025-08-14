@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import RecipeCard from "./RecipeCard";
+import RecipeDetailsModal from "./RecipeDetailsModal";
 import { fetchRecipes } from "../services/BackendService";
 import { useLocation } from "react-router-dom";
 import { useSelectedRecipes } from "../context/SelectedRecipesContext";
@@ -110,8 +111,8 @@ const RecipeSection = () => {
    * If a recipe is clicked, it becomes selected and its category is also set.
    * If the same recipe is clicked again, it becomes unselected.
    */
-  const handleRecipeClick = (recipe, category) => {
-    setSelectedRecipe(selectedRecipe === recipe ? null : recipe);
+  const handleCardOpen = (recipe) => {
+    setSelectedRecipe(recipe);
   };
 
   // Set document title
@@ -153,7 +154,7 @@ const RecipeSection = () => {
 
   return (
     <section className="relative">
-      <div className="absolute inset-0 bg-gradient-to-b from-rose-50 via-white to-amber-50 dark:from-gray-900 dark:via-gray-950 dark:to-black -z-10" />
+      <div className="absolute inset-0 page-gradient -z-10" />
       <div className="max-w-6xl mx-auto px-4 py-8">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -161,7 +162,7 @@ const RecipeSection = () => {
           transition={{ duration: 0.4 }}
           className="text-center mb-8"
         >
-          <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-rose-500 via-orange-400 to-fuchsia-500 bg-clip-text text-transparent">
+          <h1 className="text-3xl md:text-4xl font-extrabold accent-text">
             Explore Recipes
           </h1>
           <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mt-2">
@@ -214,7 +215,7 @@ const RecipeSection = () => {
                 className="rounded-2xl bg-white/60 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-4"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl md:text-2xl font-bold capitalize bg-gradient-to-r from-rose-500 to-fuchsia-500 bg-clip-text text-transparent">
+                  <h2 className="text-xl md:text-2xl font-bold capitalize accent-text">
                     {category}
                   </h2>
                 </div>
@@ -226,13 +227,11 @@ const RecipeSection = () => {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, amount: 0.2 }}
                       transition={{ duration: 0.35 }}
-                      onClick={() => handleRecipeClick(recipe, category)}
                     >
                       <RecipeCard
                         recipe={recipe}
-                        isExpanded={
-                          selectedRecipe && selectedRecipe._id === recipe._id
-                        }
+                        isExpanded={false}
+                        onClick={() => handleCardOpen(recipe)}
                         onSelect={() => handleSelectRecipe(recipe._id)}
                         showSelectButton={!!passedCategory || fromShoppingList}
                       />
@@ -247,6 +246,19 @@ const RecipeSection = () => {
             No recipes found.
           </div>
         )}
+
+        {/* Details Modal */}
+        <AnimatePresence>
+          {selectedRecipe && (
+            <RecipeDetailsModal
+              key={selectedRecipe._id}
+              recipe={selectedRecipe}
+              onClose={() => setSelectedRecipe(null)}
+              showSelectButton={!!passedCategory || fromShoppingList}
+              onSelect={() => handleSelectRecipe(selectedRecipe._id)}
+            />
+          )}
+        </AnimatePresence>
       </div>
     </section>
   );

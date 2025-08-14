@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { useShoppingList } from "../context/ShoppingListContext";
 import { useNavigate } from "react-router-dom";
 import { useRecipesForShoppingList } from "../context/RecipesForShoppingListContext";
@@ -22,7 +23,6 @@ const ShoppingSection = () => {
   const [ingredientName, setIngredientName] = useState("");
   const [quantity, setQuantity] = useState("");
   const [unit, setUnit] = useState("");
-  const [manuallyAddedIngredients, setManuallyAddedIngredients] = useState([]);
   const [recipeIngredients, setRecipeIngredients] = useState([]);
 
   // useEffect to calculate recipe ingredients based on selected recipes
@@ -44,9 +44,13 @@ const ShoppingSection = () => {
     if (!quantityStr) return 0;
     if (quantityStr.includes("/")) {
       const [numerator, denominator] = quantityStr.split("/");
-      return parseFloat(numerator) / parseFloat(denominator);
+      const n = parseFloat(numerator);
+      const d = parseFloat(denominator) || 1;
+      if (isNaN(n) || isNaN(d)) return 0;
+      return n / d;
     }
-    return parseFloat(quantityStr);
+    const v = parseFloat(quantityStr);
+    return isNaN(v) ? 0 : v;
   };
 
   // Handlers for adding, subtracting, and removing recipes
@@ -81,171 +85,160 @@ const ShoppingSection = () => {
       unit: unit.trim(),
     };
 
-    // Add manually added ingredient to the state
+    // Persist to shopping list context
     addIngredientToShoppingList(newIngredient);
 
-    // Clear input fields after adding ingredient
+    // Clear inputs
     setIngredientName("");
     setQuantity("");
     setUnit("");
   };
 
-  // Combine manually added ingredients with recipe ingredients and initial shopping list
-  const combinedShoppingList = [
-    ...initialShoppingList,
-    ...manuallyAddedIngredients,
-    ...recipeIngredients,
-  ];
+  // Combine context shopping list with recipe-derived ingredients
+  const combinedShoppingList = [...initialShoppingList, ...recipeIngredients];
+  // Animations
+  const card = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } };
 
   return (
-    <div
-      className="container mx-auto p-4 max-w-8xl relative grid grid-cols-2 gap-4"
+    <section
+      className="relative"
       style={{
         backgroundImage: `url(${ShopBg})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
     >
-      <div className="col-span-1 bg-opacity-50 dark:bg-opacity-30 p-4 rounded-lg flex flex-col justify-center items-center bg-white dark:bg-gray-800">
-        <button
-          className="mt-6 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-full transition-colors duration-150 ease-in-out mb-4"
-          onClick={handleAddRecipe}
-        >
-          Add Ingredients According To Recipe
-        </button>
-        <input
-          type="text"
-          value={ingredientName}
-          onChange={(e) => setIngredientName(e.target.value)}
-          placeholder="Ingredient Name..."
-          className="border border-gray-300 dark:border-gray-600 rounded-lg p-2 mb-4 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300"
-        />
-        <div className="flex items-center mb-4">
-          <input
-            type="number"
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
-            placeholder="Quantity"
-            className="border border-gray-300 dark:border-gray-600 rounded-l-lg p-2 mr-1 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300"
-          />
-          <select
-            value={unit}
-            onChange={(e) => setUnit(e.target.value)}
-            className="border border-gray-300 dark:border-gray-600 rounded-r-lg p-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+      <div className="container mx-auto max-w-6xl px-4 py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Add Ingredients / Manual Entry */}
+          <motion.div
+            variants={card}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            className="rounded-2xl bg-white/80 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-6"
           >
-            <option value="">Select Unit</option>
-            <option value="tsp">Teaspoon</option>
-            <option value="cup">Cup</option>
-            <option value="whole">Whole</option>
-            <option value="g">Gram</option>
-          </select>
+            <h3 className="text-lg font-extrabold bg-gradient-to-r from-rose-500 via-orange-400 to-fuchsia-500 bg-clip-text text-transparent">
+              Add Ingredients
+            </h3>
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">Add manually or from selected recipes.</p>
+
+            <div className="mt-4 flex flex-col sm:flex-row gap-3">
+              <button
+                className="inline-flex items-center justify-center px-4 py-2.5 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-rose-500 to-fuchsia-500 shadow hover:shadow-md transition-shadow"
+                onClick={handleAddRecipe}
+              >
+                Add from Recipes
+              </button>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <input
+                type="text"
+                value={ingredientName}
+                onChange={(e) => setIngredientName(e.target.value)}
+                placeholder="Ingredient name"
+                className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400"
+              />
+              <input
+                type="number"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                placeholder="Qty"
+                className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400"
+              />
+              <select
+                value={unit}
+                onChange={(e) => setUnit(e.target.value)}
+                className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400"
+              >
+                <option value="">Unit</option>
+                <option value="tsp">Teaspoon</option>
+                <option value="cup">Cup</option>
+                <option value="whole">Whole</option>
+                <option value="g">Gram</option>
+              </select>
+            </div>
+            <div className="mt-3">
+              <button
+                onClick={handleAddIngredient}
+                className="inline-flex items-center justify-center px-4 py-2.5 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-rose-500 to-fuchsia-500 shadow hover:shadow-md transition-shadow"
+              >
+                Add Ingredient
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Selected Recipes */}
+          <motion.div
+            variants={card}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            className="rounded-2xl bg-white/80 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-6"
+          >
+            <h3 className="text-lg font-extrabold text-gray-800 dark:text-gray-100">Selected Recipes</h3>
+            <div className="mt-3 overflow-auto max-h-80">
+              <table className="min-w-full text-sm divide-y divide-gray-200 dark:divide-white/10">
+                <thead className="bg-gray-50 dark:bg-white/5">
+                  <tr>
+                    <th className="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Recipe</th>
+                    <th className="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Qty</th>
+                    <th className="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white/70 dark:bg-gray-900/40 divide-y divide-gray-100 dark:divide-white/10">
+                  {recipesForShoppingList.map((recipe, index) => (
+                    <tr key={index} className="hover:bg-gray-50/80 dark:hover:bg-white/10">
+                      <td className="px-4 py-2 text-gray-800 dark:text-gray-200">{recipe.title}</td>
+                      <td className="px-4 py-2 text-gray-600 dark:text-gray-300">{recipe.quantity}</td>
+                      <td className="px-4 py-2">
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => handleAddQuantity(recipe._id)} className="px-2.5 py-1.5 rounded-md bg-emerald-500 text-white hover:bg-emerald-600 text-xs font-semibold">+1</button>
+                          <button onClick={() => handleSubQuantity(recipe._id)} className="px-2.5 py-1.5 rounded-md bg-amber-500 text-white hover:bg-amber-600 text-xs font-semibold">-1</button>
+                          <button onClick={() => handleRemoveRecipe(recipe._id)} className="px-2.5 py-1.5 rounded-md bg-rose-500 text-white hover:bg-rose-600 text-xs font-semibold">Remove</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
+
+          {/* Shopping List */}
+          <motion.div
+            variants={card}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            className="lg:col-span-2 rounded-2xl bg-white/80 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-6"
+          >
+            <h3 className="text-lg font-extrabold text-gray-800 dark:text-gray-100">Shopping List</h3>
+            <div className="mt-3 overflow-auto max-h-80">
+              <table className="min-w-full text-sm divide-y divide-gray-200 dark:divide-white/10">
+                <thead className="bg-gray-50 dark:bg-white/5">
+                  <tr>
+                    <th className="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Ingredient</th>
+                    <th className="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Quantity</th>
+                    <th className="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Unit</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white/70 dark:bg-gray-900/40 divide-y divide-gray-100 dark:divide-white/10">
+                  {combinedShoppingList.map(({ name, quantity, unit }, index) => (
+                    <tr key={index} className="hover:bg-gray-50/80 dark:hover:bg-white/10">
+                      <td className="px-4 py-2 text-gray-800 dark:text-gray-200">{name}</td>
+                      <td className="px-4 py-2 text-gray-600 dark:text-gray-300">{quantity}</td>
+                      <td className="px-4 py-2 text-gray-600 dark:text-gray-300">{unit}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
         </div>
-        <button
-          onClick={handleAddIngredient}
-          className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-full transition-colors duration-150 ease-in-out"
-        >
-          Add Ingredient
-        </button>
       </div>
-      <div className="col-span-1 bg-opacity-80 shadow-lg bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
-        <h2 className="text-2xl font-extrabold text-indigo-600 dark:text-indigo-400 tracking-tight">
-          Selected recipes for shopping list
-        </h2>
-        <div className="overflow-auto max-h-96">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th className="px-6 py-3 font-semibold text-left text-gray-600 dark:text-gray-300 uppercase">
-                  Recipe
-                </th>
-                <th className="px-6 py-3 font-semibold text-left text-gray-600 dark:text-gray-300 uppercase">
-                  Quantity
-                </th>
-                <th className="px-6 py-3 font-semibold text-left text-gray-600 dark:text-gray-300 uppercase">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {recipesForShoppingList.map((recipe, index) => (
-                <tr
-                  key={index}
-                  className="hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-200">
-                    {recipe.title}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    {recipe.quantity}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    <button
-                      onClick={() => handleAddQuantity(recipe._id)}
-                      className="bg-green-500 hover:bg-green-600 dark:bg-green-700 dark:hover:bg-green-800 text-white font-bold py-2 px-4 rounded mr-2"
-                    >
-                      +
-                    </button>
-                    <button
-                      onClick={() => handleSubQuantity(recipe._id)}
-                      className="bg-green-500 hover:bg-green-600 dark:bg-green-700 dark:hover:bg-green-800 text-white font-bold py-2 px-4 rounded mr-2"
-                    >
-                      -
-                    </button>
-                    <button
-                      onClick={() => handleRemoveRecipe(recipe._id)}
-                      className="bg-red-500 hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-800 text-white font-bold py-2 px-4 rounded"
-                    >
-                      Remove
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div className="col-span-1"></div>
-      <div className="col-span-1 shadow-lg bg-gray-100 dark:bg-gray-800 p-4 rounded-lg bg-opacity-80">
-        <h2 className="text-2xl font-extrabold text-indigo-600 dark:text-indigo-400 tracking-tight">
-          Shopping List
-        </h2>
-        <div className="overflow-auto max-h-96">
-          <table className="min-w-full text-sm divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th className="px-4 py-3 font-semibold text-left text-gray-600 dark:text-gray-300 uppercase">
-                  Ingredient
-                </th>
-                <th className="px-4 py-3 font-semibold text-left text-gray-600 dark:text-gray-300 uppercase">
-                  Quantity
-                </th>
-                <th className="px-4 py-3 font-semibold text-left text-gray-600 dark:text-gray-300 uppercase">
-                  Unit
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-700 bg-white dark:bg-gray-800">
-              {combinedShoppingList.map(({ name, quantity, unit }, index) => (
-                <tr
-                  key={index}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-700"
-                >
-                  <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
-                    {name}
-                  </td>
-                  <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
-                    {quantity}
-                  </td>
-                  <td className="px-4 py-2 text-gray-700 dark:text-gray-300">
-                    {unit}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+    </section>
   );
 };
 

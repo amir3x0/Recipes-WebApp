@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import sign from "../home_img/sign.png";
 import { registerNewUser } from "../../../services/BackendService";
 
@@ -31,7 +32,7 @@ export default function JoinUs() {
     e.preventDefault(); // Prevent default form submission
     try {
       // Call backend service to register new user
-      const response = registerNewUser(name, email, username, password);
+      const response = await registerNewUser(name, email, username, password);
       if (response) {
         setSubmitMessage("User Created!");
       } else {
@@ -44,105 +45,127 @@ export default function JoinUs() {
 
   // JSX for rendering the JoinUs component
   return (
-    <div className="flex flex-col md:flex-row md:items-start gap-36 p-8 my-20 animate-fadeIn rounded-lg dark:bg-gray-800">
-      {/* Image Section */}
-      <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
-        {images.map((src, index) => (
-          <img
-            key={index}
-            src={src}
-            alt="Sign"
-            className="w-48 md:w-64 lg:w-80 xl:w-96 rounded-full"
-          />
-        ))}
-      </div>
+  <section className="relative max-w-6xl mx-auto px-4 my-16">
+      {/* accent line */}
+      <div className="absolute inset-x-0 -top-3 h-1 bg-gradient-to-r from-rose-500 via-orange-400 to-fuchsia-500 rounded-full blur-[1px]" aria-hidden="true" />
 
-      {/* Content Section */}
-      <div className="text-center md:text-left md:pl-4 font-bold dark:text-gray-200">
-        <h1 className="text-4xl text-red-800 dark:text-red-400 mb-4">
-          Join The Fatties!
-        </h1>
-        <p className="text-3xl text-gray-700 dark:text-gray-300">
-          Why, you ask? <br />
-        </p>
-
-        {reasons.map((item, index) => (
-          <div
-            key={index}
-            className="mb-3 pl-4 border-l-4 border-red-800 dark:border-red-400"
-          >
-            <p className="text-2xl text-gray-600 dark:text-gray-300">{item}</p>
+      <div className="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl overflow-hidden">
+        <div className="flex flex-col md:flex-row items-start gap-8 p-6 md:p-10">
+          {/* Image Section */}
+          <div className="flex-1 flex items-center justify-center">
+            {images.map((src, index) => (
+              <img
+                key={index}
+                src={src}
+                alt="Sign"
+                className="w-48 md:w-60 lg:w-64 xl:w-72 rounded-full ring-1 ring-black/5 dark:ring-white/10"
+                loading="lazy"
+              />
+            ))}
           </div>
-        ))}
 
-        <div className="flex justify-center">
-          <button
-            onClick={() => setShowForm(!showForm)} // Toggle form visibility
-            className="bg-red-800 hover:bg-red-600 text-white text-xl rounded-lg px-8 py-3 my-5 font-semibold transition duration-300 ease-in-out transform hover:-translate-y-1"
-          >
-            Sign Up
-          </button>
-        </div>
+          {/* Content Section */}
+          <div className="flex-1 text-center md:text-left dark:text-gray-200">
+            <h2 className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-rose-500 via-orange-400 to-fuchsia-500 bg-clip-text text-transparent">
+              Join The Fatties!
+            </h2>
+            <p className="mt-2 text-lg text-gray-700 dark:text-gray-300">Why, you ask?</p>
 
-        {/* Sign Up Section */}
-        {showForm && (
-          <div className="mt-5 mx-auto transition-all duration-500 transform origin-top bg-white dark:bg-gray-700 shadow-md rounded-lg p-6">
-            <div className="text-red-800 dark:text-red-400 font-bold text-xl mb-5 border-b-4">
-              Enter Info
+            <div className="mt-6 space-y-3">
+              {reasons.map((item, index) => (
+                <div key={index} className="pl-4 border-l-4 border-rose-500/60">
+                  <p className="text-lg text-gray-600 dark:text-gray-300 font-semibold">{item}</p>
+                </div>
+              ))}
             </div>
-            <form
-              onSubmit={handleSubmit}
-              className="flex flex-col items-center gap-4"
-            >
-              <input
-                type="text"
-                placeholder="Name"
-                value={name}
-                onChange={(e) => handleInputChange(e, setName)}
-                className="input border-2 border-gray-300 rounded-lg p-2 w-full"
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => handleInputChange(e, setEmail)}
-                className="input border-2 border-gray-300 rounded-lg p-2 w-full"
-              />
-              <input
-                type="text"
-                placeholder="User Name"
-                value={username}
-                onChange={(e) => handleInputChange(e, setUsername)}
-                className="input border-2 border-gray-300 rounded-lg p-2 w-full"
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => handleInputChange(e, setPassword)}
-                className="input border-2 border-gray-300 rounded-lg p-2 w-full"
-              />
+
+      <div className="mt-6 flex justify-center md:justify-start">
               <button
-                type="submit"
-                className="bg-red-800 hover:bg-red-600 text-white text-lg rounded-lg px-4 py-2 mt-4 font-semibold transition duration-300"
+                onClick={() => setShowForm((s) => !s)}
+        className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-rose-500 to-fuchsia-500 shadow hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-rose-400"
               >
-                Submit
+                {showForm ? "Hide Form" : "Sign Up"}
               </button>
-            </form>
-            {submitMessage && (
-              <p
-                className={`flex justify-center font-bold mt-5 ${
-                  submitMessage === "Failed to login."
-                    ? "text-red-500"
-                    : "text-green-500"
-                }`}
-              >
-                {submitMessage}
-              </p>
-            )}
+            </div>
+
+            {/* Sign Up Section */}
+            <AnimatePresence initial={false}>
+              {showForm && (
+                <motion.div
+                  key="signup"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.35 }}
+                  className="mt-6 overflow-hidden"
+                >
+                  <div className="bg-white dark:bg-gray-800 ring-1 ring-black/5 dark:ring-white/10 rounded-2xl p-5">
+                    <div className="text-rose-600 dark:text-rose-400 font-bold text-base mb-3">
+                      Enter Info
+                    </div>
+                    <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <input
+                        type="text"
+                        placeholder="Name"
+                        value={name}
+                        onChange={(e) => handleInputChange(e, setName)}
+                        className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-rose-400 text-sm"
+                        required
+                      />
+                      <input
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => handleInputChange(e, setEmail)}
+                        className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-rose-400 text-sm"
+                        required
+                      />
+                      <input
+                        type="text"
+                        placeholder="User Name"
+                        value={username}
+                        onChange={(e) => handleInputChange(e, setUsername)}
+                        className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-rose-400 text-sm"
+                        required
+                      />
+                      <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => handleInputChange(e, setPassword)}
+                        className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-rose-400 text-sm"
+                        minLength={6}
+                        required
+                      />
+                      <div className="sm:col-span-2 flex justify-end">
+                        <button
+                          type="submit"
+                          className="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-rose-500 to-fuchsia-500 shadow hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-rose-400"
+                        >
+                          Submit
+                        </button>
+                      </div>
+                    </form>
+                    {submitMessage && (
+                      <p
+                        className={`mt-4 text-sm font-semibold ${
+                          submitMessage === "Failed to create user."
+                            ? "text-red-500"
+                            : submitMessage === "User already exists."
+                            ? "text-yellow-500"
+                            : "text-green-600"
+                        }`}
+                      >
+                        {submitMessage}
+                      </p>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-        )}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

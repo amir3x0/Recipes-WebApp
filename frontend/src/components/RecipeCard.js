@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FaRegHeart, FaHeart } from "react-icons/fa";
+import { motion } from "framer-motion";
 import { addFavoriteRecipe , removeFavoriteRecipe } from "../services/BackendService";
 import { useUser } from "../context/UserContext";
 
@@ -43,97 +44,106 @@ const RecipeCard = ({
   };
 
   return (
-    <div
-    className={`border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out cursor-pointer ${
-      isExpanded ? "scale-105" : "scale-100"
-    }`}
-    onClick={onClick}
-  >
-    <img
-      src={recipe.picture}
-      alt={recipe.title}
-      className="w-full h-48 object-cover"
-    />
-    <div className={`p-4 ${isExpanded ? "px-8 py-6" : "px-4 py-4"} dark:bg-gray-800`}>
-      <div className="flex justify-between items-center">
-        <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">{recipe.title}</p>
+    <motion.article
+      whileHover={{ y: -4 }}
+      transition={{ type: "spring", stiffness: 350, damping: 25 }}
+      className={`rounded-2xl overflow-hidden ring-1 ring-black/5 dark:ring-white/10 shadow-xl bg-white/70 dark:bg-gray-900/60 backdrop-blur cursor-pointer ${
+        isExpanded ? "outline outline-2 outline-rose-400/40" : ""
+      }`}
+      onClick={onClick}
+    >
+      <div className="relative">
+        <img
+          src={recipe.picture}
+          alt={recipe.title}
+          className="w-full h-44 md:h-48 object-cover"
+        />
         {user && (
           <button
+            aria-label={liked ? "Remove from favorites" : "Add to favorites"}
             onClick={(e) => {
               e.stopPropagation();
               handleLike();
             }}
+            className="absolute top-2 right-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur px-2 py-1 rounded-full shadow ring-1 ring-black/5 dark:ring-white/10"
           >
-            {liked ? <FaHeart color="red" /> : <FaRegHeart color="grey" />}
+            {liked ? <FaHeart className="text-rose-500" /> : <FaRegHeart className="text-gray-500" />}
           </button>
         )}
       </div>
-      {isExpanded && (
-        <>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">{recipe.description}</p>
-          <div className="mt-4">
-            <ul className="list-disc list-inside">
-              <p className="text-sm font-semibold dark:text-gray-200">Steps:</p>
-              {recipe.instructions.map((step, index) => (
-                <li key={index} className="text-sm text-gray-700 dark:text-gray-300">
-                  {step}
-                </li>
-              ))}
-            </ul>
-            <p className="text-sm mt-2 dark:text-gray-200">
-              <span className="font-semibold">Difficulty:</span> {recipe.difficulty}
-            </p>
-            <div className="mt-2">
-              <p className="text-sm font-semibold dark:text-gray-200">Ingredients:</p>
-              <ul className="list-disc list-inside">
-                {recipe.ingredients.map((ingredient, index) => (
-                  <li
-                    key={index}
-                    className="text-sm text-gray-700 dark:text-gray-300"
-                  >{`${ingredient.name} - ${ingredient.quantity} ${ingredient.unit}`}</li>
+      <div className={`p-4 ${isExpanded ? "pt-5" : "pt-4"}`}>
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="text-base md:text-lg font-bold text-gray-900 dark:text-gray-100 line-clamp-1">
+            {recipe.title}
+          </h3>
+          <span className="px-2 py-1 rounded-full text-[10px] font-semibold bg-gradient-to-r from-amber-400/20 to-fuchsia-400/20 text-amber-700 dark:text-amber-300 ring-1 ring-amber-400/30">
+            {recipe.difficulty}
+          </span>
+        </div>
+
+        {isExpanded && (
+          <div className="mt-3 space-y-3 text-sm">
+            <p className="text-gray-700 dark:text-gray-300">{recipe.description}</p>
+
+            <div>
+              <p className="text-xs font-semibold text-gray-900 dark:text-gray-200 mb-1">Steps</p>
+              <ul className="list-disc list-inside space-y-1">
+                {recipe.instructions.map((step, index) => (
+                  <li key={index} className="text-gray-700 dark:text-gray-300">
+                    {step}
+                  </li>
                 ))}
               </ul>
             </div>
-            <div className="mt-2">
-              <p className="text-sm dark:text-gray-200">
-                <span className="font-semibold">Calories:</span> {recipe.calories.total} kcal
-              </p>
-              <p className="text-sm dark:text-gray-200">
-                <span className="font-semibold">Protein:</span> {recipe.calories.protein} g
-              </p>
-              <p className="text-sm dark:text-gray-200">
-                <span className="font-semibold">Carbs:</span> {recipe.calories.carbs} g
-              </p>
-              <p className="text-sm dark:text-gray-200">
-                <span className="font-semibold">Fat:</span> {recipe.calories.fat} g
-              </p>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <p className="text-xs font-semibold text-gray-900 dark:text-gray-200 mb-1">Ingredients</p>
+                <ul className="list-disc list-inside space-y-1">
+                  {recipe.ingredients.map((ingredient, index) => (
+                    <li key={index} className="text-gray-700 dark:text-gray-300">
+                      {`${ingredient.name} - ${ingredient.quantity} ${ingredient.unit}`}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="rounded-xl bg-gray-50 dark:bg-gray-800 p-3 ring-1 ring-black/5 dark:ring-white/10">
+                <p className="text-xs font-semibold text-gray-900 dark:text-gray-200 mb-2">Nutrition</p>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">Cal {recipe.calories.total}</span>
+                  <span className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded">Prot {recipe.calories.protein}g</span>
+                  <span className="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded">Carb {recipe.calories.carbs}g</span>
+                  <span className="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 px-2 py-1 rounded">Fat {recipe.calories.fat}g</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Conditional buttons */}
+            <div className="flex gap-2 pt-1">
+              {showSelectButton && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelect(recipe._id);
+                  }}
+                  className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold rounded-lg text-white bg-gradient-to-r from-emerald-500 to-teal-500 shadow hover:shadow-md transition-shadow"
+                >
+                  Select
+                </button>
+              )}
+              {showAddIngredientsButton && (
+                <button
+                  onClick={handleAddIngredientsClick}
+                  className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold rounded-lg text-white bg-gradient-to-r from-rose-500 to-fuchsia-500 shadow hover:shadow-md transition-shadow"
+                >
+                  Add Ingredients
+                </button>
+              )}
             </div>
           </div>
-          {/* Conditional buttons */}
-          {showSelectButton && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onSelect(recipe._id);
-              }}
-              className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded dark:bg-blue-600 dark:hover:bg-blue-800"
-            >
-              Select
-            </button>
-          )}
-          {showAddIngredientsButton && (
-            <button
-              onClick={handleAddIngredientsClick}
-              className="mt-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded dark:bg-green-600 dark:hover:bg-green-800"
-            >
-              Add Ingredients
-            </button>
-          )}
-        </>
-      )}
-    </div>
-  </div>
-  
+        )}
+      </div>
+    </motion.article>
   );
 };
 

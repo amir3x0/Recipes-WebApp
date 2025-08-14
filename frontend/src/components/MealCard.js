@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import RecipeCard from "./RecipeCard";
+import { motion } from "framer-motion";
 
 // MealCard component is designed to display information about a meal,
 // including a visual collage of recipes and an option to expand for more details.
@@ -51,13 +52,14 @@ const MealCard = ({ meal, onExpandChange }) => {
   };
 
   return (
-    <div
-      onClick={toggleExpand} // Allows toggling expand/collapse on click.
-      className={`meal-card border-2 border-gray-300 dark:border-gray-600 rounded-lg shadow-lg dark:shadow-gray-800/50 hover:shadow-xl dark:hover:shadow-gray-700/50 transition-all duration-300 ease-in-out overflow-hidden ${
-        isExpanded ? "p-8 w-full" : "p-4"
-      } cursor-pointer dark:bg-gray-900 dark:text-gray-200`} // Styling adjusts based on theme and expansion state.
+    <motion.div
+      whileHover={{ y: -3 }}
+      onClick={toggleExpand}
+      className={`rounded-2xl overflow-hidden ring-1 ring-black/5 dark:ring-white/10 shadow-xl bg-white/70 dark:bg-gray-900/60 backdrop-blur cursor-pointer ${
+        isExpanded ? "p-6" : "p-4"
+      }`}
     >
-      <h2 className="text-2xl font-extrabold mb-6 text-green-800 dark:text-green-400 hover:text-green-600 dark:hover:text-green-300 transition-colors duration-200 ease-in-out cursor-pointer">{meal.name}</h2>
+      <h2 className="text-xl md:text-2xl font-extrabold mb-4 bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">{meal.name}</h2>
       {isExpanded ? (
         <div className="space-y-4 w-full">
           {meal.recipes.map((recipe) => (
@@ -73,15 +75,17 @@ const MealCard = ({ meal, onExpandChange }) => {
         <>
           {renderCollage()} 
           <div className="mt-4">
-            <ul className="list-disc pl-5 space-y-1">
+            <div className="flex flex-wrap gap-2">
               {meal.recipes.map((recipe) => (
-                <li key={recipe._id} className="dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 ease-in-out">{recipe.title}</li> // List out recipe titles as a quick reference.
+                <span key={recipe._id} className="px-3 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-rose-500/10 to-fuchsia-500/10 text-rose-600 dark:text-rose-300 ring-1 ring-rose-500/20">
+                  {recipe.title}
+                </span>
               ))}
-            </ul>
+            </div>
           </div>
         </>
       )}
-    </div>
+    </motion.div>
   );
 };
 

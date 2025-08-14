@@ -18,7 +18,6 @@ const RecipeSection = () => {
   const [displayedRecipes, setDisplayedRecipes] = useState({}); // Recipes currently displayed based on filters
   const [searchTerm, setSearchTerm] = useState(""); // Search term to filter recipes
   const [selectedRecipe, setSelectedRecipe] = useState(null); // Currently selected recipe
-  const [selectedCategory, setSelectedCategory] = useState(null); // Currently selected category
   const [loadingStatus, setLoadingStatus] = useState("Loading"); // Loading status of recipe data
   const location = useLocation(); // Location object to access state from router
   const fromShoppingList = location.state?.fromShoppingList; // Flag indicating if redirected from shopping list
@@ -112,7 +111,6 @@ const RecipeSection = () => {
    */
   const handleRecipeClick = (recipe, category) => {
     setSelectedRecipe(selectedRecipe === recipe ? null : recipe);
-    setSelectedCategory(selectedRecipe === recipe ? null : category);
   };
 
   // Set document title

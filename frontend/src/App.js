@@ -11,6 +11,7 @@ import Share from "./pages/share/Share";
 import MyYummy from "./pages/profile/MyYummy"; // A place for users to feel at home.
 import Footer from "./components/Footer"; // Can't forget about the footer, it ties everything together.
 import SignInPage from "./components/SignInPage"; // For our users to sign in.
+import SignUpPage from "./components/SignUpPage";
 // Contexts - these are like our recipe ingredients for global state management.
 import { ShoppingListProvider } from "./context/ShoppingListContext";
 import { SelectedRecipesProvider } from "./context/SelectedRecipesContext";
@@ -42,6 +43,7 @@ function App() {
                       <Route path="/Shopping" element={<Shopping />} />
                       <Route path="/MyYummy" element={<MyYummy />} />
                       <Route path="/SignIn" element={<SignInPage />} />
+                      <Route path="/SignUp" element={<SignUpPage />} />
                     </Routes>
                   </div>
                   <Footer /> {/* Our footer, because every page needs a solid base. */}

@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
+import { motion, AnimatePresence } from "framer-motion";
 import { useUser } from "../context/UserContext";
 
 // Define navigation items for users who are logged in and logged out.
@@ -25,21 +26,26 @@ const loggedOutItems = [
 // Component for individual navigation items.
 const NavItem = ({ item, onItemClick, isActive }) => {
   return (
-    <li className="relative group">
+    <li className="relative">
       <Link
         to={item.path}
-        className={`px-4 py-2 font-bold text-lg ${
+        className={`px-3 py-2 text-sm font-semibold transition-colors ${
           isActive
-            ? "text-red-800 dark:text-red-400"
-            : "text-gray-900 dark:text-gray-200"
-        } hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-300`}
+            ? "text-rose-600 dark:text-rose-400"
+            : "text-gray-800 dark:text-gray-200 hover:text-rose-500"
+        }`}
         onClick={onItemClick}
       >
-        {item.name}
+        <span className="relative">
+          {item.name}
+          {isActive && (
+            <motion.span
+              layoutId="nav-underline"
+              className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-rose-500 via-orange-400 to-fuchsia-500 rounded-full"
+            />
+          )}
+        </span>
       </Link>
-      <span className="cursor-pointer text-blue-500 absolute transition-all duration-500 right-0 top-0 group-hover:right-[90%] opacity-0 group-hover:opacity-100">
-        /
-      </span>
     </li>
   );
 };
@@ -81,65 +87,154 @@ const NavBar = () => {
     }
   };
 
+  // Variants for mobile menu animation
+  const overlayVariants = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1 },
+    exit: { opacity: 0 },
+  };
+  const panelVariants = {
+    hidden: { x: "100%" },
+    show: { x: 0, transition: { type: "spring", stiffness: 260, damping: 30 } },
+    exit: { x: "100%" },
+  };
+
+  const isPathActive = (path, name) => {
+    const p = location.pathname;
+    return (
+      p === path ||
+      ((p === "/A6" || p === "/A6-Final/" || p === "/A6-Final") && name === "Home")
+    );
+  };
+
   return (
-    <section
-      className={`shadow-lg sticky top-0 left-0 right-0 z-50 mb-10 bg-white dark:bg-gray-800 dark:shadow-gray-700/50`}
-    >
-      <header className="container mx-auto px-5 flex justify-between py-4 items-center">
-        <div className="text-2xl font-bold text-red-800 dark:text-red-400">
-          Yu<span className="text-black dark:text-white">mm</span>y
-        </div>
+    <section className="sticky top-0 left-0 right-0 z-50 mb-10">
+      {/* gradient accent line */}
+      <div className="h-1 bg-gradient-to-r from-rose-500 via-orange-400 to-fuchsia-500" />
 
-        {logged && (
-          <div>
-            <div className="font-bold text-xl text-red-800 dark:text-white">
-              {username}
-            </div>
-          </div>
-        )}
+      <header className="backdrop-blur-xl bg-white/70 dark:bg-gray-900/60 ring-1 ring-black/5 dark:ring-white/10 shadow-sm">
+        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
+          {/* Brand */}
+          <Link to="/" className="inline-flex items-center gap-1">
+            <span className="text-2xl font-extrabold bg-gradient-to-r from-rose-500 via-orange-400 to-fuchsia-500 bg-clip-text text-transparent">
+              Yummy
+            </span>
+          </Link>
 
-        <div className="lg:hidden z-50">
-          {navIsVisible ? (
-            <AiOutlineClose
-              className="w-6 h-6"
-              onClick={navVisibilityHandler}
-            />
-          ) : (
-            <AiOutlineMenu className="w-6 h-6" onClick={navVisibilityHandler} />
-          )}
-        </div>
+          {/* Desktop nav */}
+          <nav className="hidden lg:block">
+            <ul className="flex items-center gap-2">
+              {navItems.map((item) => (
+                <NavItem
+                  key={item.name}
+                  item={item}
+                  onItemClick={() => {}}
+                  isActive={isPathActive(item.path, item.name)}
+                />
+              ))}
+            </ul>
+          </nav>
 
-        <div
-          className={`${
-            navIsVisible ? "right-0" : "-right-full"
-          } transition-all duration-300 mt-[56px] lg:mt-0 bg-dark-hard lg:bg-transparent z-[49] flex flex-col w-full lg:w-auto justify-center lg:justify-end lg:flex-row fixed top-0 bottom-0 lg:static gap-x-9 items-center`}
-        >
-          <ul className="text-white items-center gap-y-5 lg:text-dark-soft flex flex-col lg:flex-row gap-x-2 font-semibold">
-            {navItems.map((item) => (
-              <NavItem
-                key={item.name}
-                item={item}
-                onItemClick={navVisibilityHandler}
-                isActive={
-                  location.pathname === item.path ||
-                  (location.pathname === "/A6" && item.name === "Home")
-                }
-              />
-            ))}
-          </ul>
-        </div>
+          {/* Right side */}
+          <div className="flex items-center gap-3">
+            {logged && (
+              <span className="hidden md:inline text-sm font-semibold text-gray-700 dark:text-gray-200">
+                {username}
+              </span>
+            )}
+            {logged && (
+              <button
+                className="hidden md:inline-flex items-center justify-center px-3 py-2 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-rose-500 to-fuchsia-500 shadow hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-rose-400"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            )}
 
-        {logged && (
-          <div className="flex justify-center">
+            {/* Mobile toggle */}
             <button
-            className="bg-red-500 dark:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:bg-red-600 dark:hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-700 dark:focus:ring-red-500 focus:ring-opacity-50 transition duration-300"
-            onClick={handleLogout}
+              className="lg:hidden inline-flex items-center justify-center p-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-rose-400"
+              aria-label="Toggle navigation menu"
+              aria-expanded={navIsVisible}
+              onClick={navVisibilityHandler}
             >
-              Logout
+              {navIsVisible ? <AiOutlineClose className="w-6 h-6" /> : <AiOutlineMenu className="w-6 h-6" />}
             </button>
           </div>
-        )}
+        </div>
       </header>
+
+      {/* Mobile menu overlay */}
+      <AnimatePresence>
+        {navIsVisible && (
+          <motion.div
+            className="fixed inset-0 z-50 lg:hidden"
+            initial="hidden"
+            animate="show"
+            exit="exit"
+            variants={overlayVariants}
+          >
+            <div
+              className="absolute inset-0 bg-black/50"
+              onClick={navVisibilityHandler}
+              aria-hidden
+            />
+            <motion.aside
+              className="ml-auto h-full w-80 max-w-[85%] bg-white dark:bg-gray-900 shadow-xl ring-1 ring-black/5 dark:ring-white/10 p-6 flex flex-col"
+              initial="hidden"
+              animate="show"
+              exit="exit"
+              variants={panelVariants}
+            >
+              <div className="flex items-center justify-between">
+                <Link to="/" onClick={navVisibilityHandler} className="text-lg font-extrabold bg-gradient-to-r from-rose-500 via-orange-400 to-fuchsia-500 bg-clip-text text-transparent">
+                  Yummy
+                </Link>
+                <button
+                  className="inline-flex items-center justify-center p-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10"
+                  onClick={navVisibilityHandler}
+                  aria-label="Close menu"
+                >
+                  <AiOutlineClose className="w-6 h-6" />
+                </button>
+              </div>
+
+              <ul className="mt-6 space-y-1">
+                {navItems.map((item) => (
+                  <li key={item.name}>
+                    <Link
+                      to={item.path}
+                      onClick={navVisibilityHandler}
+                      className={`block px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                        isPathActive(item.path, item.name)
+                          ? "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+                          : "text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10"
+                      }`}
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+
+              {logged && (
+                <div className="mt-auto pt-6 border-t border-gray-200 dark:border-white/10">
+                  <div className="text-sm text-gray-700 dark:text-gray-300 mb-3">{username}</div>
+                  <button
+                    className="w-full inline-flex items-center justify-center px-3 py-2 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-rose-500 to-fuchsia-500 shadow hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-rose-400"
+                    onClick={() => {
+                      navVisibilityHandler();
+                      handleLogout();
+                    }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </motion.aside>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };

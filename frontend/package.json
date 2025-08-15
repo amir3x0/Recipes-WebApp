@@ -13,6 +13,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.6.7",
+    "framer-motion": "^12.23.12",
     "imagekitio-react": "^4.0.0",
     "react": "^18.2.0",
     "react-beautiful-dnd": "^13.1.1",

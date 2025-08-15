@@ -12,27 +12,36 @@ export const ThemeProvider = ({ children }) => {
   // Using the user context to access and modify the user's theme preference.
   const { user, updateUser } = useUser(); // Assuming `updateUser` can update the user's theme
 
-  // Effect hook to apply the current theme preference to the document element.
-  // This makes the theme globally effective across the entire webpage.
+  // Effect: apply the current theme to <html> via classes.
   useEffect(() => {
-    // Determine the class to add based on the user's theme setting.
-    const themeClass = user?.theme === "dark" ? "dark" : "light";
-    // First, remove any existing theme classes to avoid conflicts.
-    document.documentElement.classList.remove("dark", "light");
-    // Then, add the current theme class.
-    document.documentElement.classList.add(themeClass);
-  }, [user?.theme]); // This effect depends on the user's theme setting.
+    const theme = user?.theme || "light";
+    const el = document.documentElement;
+    el.classList.remove(
+      "dark",
+      "light",
+      "theme-light",
+      "theme-dark",
+      "theme-ocean",
+      "theme-forest",
+      "theme-grape"
+    );
+    if (theme === "dark") {
+      el.classList.add("dark", "theme-dark");
+    } else if (["light", "ocean", "forest", "grape"].includes(theme)) {
+      el.classList.add("light", `theme-${theme}`);
+    } else {
+      // Fallback
+      el.classList.add("light", "theme-light");
+    }
+  }, [user?.theme]);
 
   // Function to toggle between light and dark themes.
   const toggleTheme = () => {
-    // Determine the new theme opposite to the current setting.
-    const newTheme = user?.theme === 'light' ? 'dark' : 'light';
-    // Update the user's theme preference using the updateUser function provided by UserContext.
-    updateUser({ ...user, theme: newTheme });
-
-    // Also update the theme class on the document element to immediately apply the new theme.
-    document.documentElement.classList.remove("dark", "light");
-    document.documentElement.classList.add(newTheme);
+    const order = ["light", "dark", "ocean", "forest", "grape"];
+    const current = user?.theme || "light";
+    const idx = order.indexOf(current);
+    const next = order[(idx + 1) % order.length];
+    updateUser({ ...user, theme: next });
   };
 
   // The value passed to the provider includes only the toggleTheme function since the theme

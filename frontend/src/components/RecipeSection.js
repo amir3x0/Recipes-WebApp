@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import RecipeCard from "./RecipeCard";
+import RecipeDetailsModal from "./RecipeDetailsModal";
 import { fetchRecipes } from "../services/BackendService";
 import { useLocation } from "react-router-dom";
 import { useSelectedRecipes } from "../context/SelectedRecipesContext";
 import { useRecipesForShoppingList } from "../context/RecipesForShoppingListContext";
 import { useNavigate } from "react-router-dom";
-import { useTheme } from "../context/ThemeContext";
+// import { useTheme } from "../context/ThemeContext";
 
 /**
  * The RecipeSection component displays a list of recipes categorized by their categories.
@@ -18,7 +20,6 @@ const RecipeSection = () => {
   const [displayedRecipes, setDisplayedRecipes] = useState({}); // Recipes currently displayed based on filters
   const [searchTerm, setSearchTerm] = useState(""); // Search term to filter recipes
   const [selectedRecipe, setSelectedRecipe] = useState(null); // Currently selected recipe
-  const [selectedCategory, setSelectedCategory] = useState(null); // Currently selected category
   const [loadingStatus, setLoadingStatus] = useState("Loading"); // Loading status of recipe data
   const location = useLocation(); // Location object to access state from router
   const fromShoppingList = location.state?.fromShoppingList; // Flag indicating if redirected from shopping list
@@ -26,7 +27,7 @@ const RecipeSection = () => {
   const { addRecipe } = useSelectedRecipes(); // Function to add selected recipes to user's list
   const { addRecipeForShoppingList } = useRecipesForShoppingList(); // Function to add recipes to shopping list
   const navigate = useNavigate(); // Function to navigate to different routes
-  const { theme } = useTheme(); // Current theme used in the application
+  // const { theme } = useTheme(); // Current theme used in the application
 
   // Effect to fetch recipes data
   useEffect(() => {
@@ -110,29 +111,14 @@ const RecipeSection = () => {
    * If a recipe is clicked, it becomes selected and its category is also set.
    * If the same recipe is clicked again, it becomes unselected.
    */
-  const handleRecipeClick = (recipe, category) => {
-    setSelectedRecipe(selectedRecipe === recipe ? null : recipe);
-    setSelectedCategory(selectedRecipe === recipe ? null : category);
+  const handleCardOpen = (recipe) => {
+    setSelectedRecipe(recipe);
   };
 
   // Set document title
   document.title = "Our Recipes";
 
-  // Category colors for light theme
-  const categoryColors = {
-    appetizers: "bg-pink-50",
-    starters: "bg-indigo-50",
-    "main dish": "bg-green-50",
-    dessert: "bg-yellow-50",
-  };
-
-  // Category colors for dark theme
-  const categoryColorsDark = {
-    appetizers: "bg-pink-900",
-    starters: "bg-indigo-900",
-    "main dish": "bg-green-900",
-    dessert: "bg-yellow-900",
-  };
+  // Removed legacy category color maps in favor of glass panels
 
   // Render error message if loading fails
   if (loadingStatus === "Error")
@@ -141,7 +127,22 @@ const RecipeSection = () => {
     );
   // Render loading message if data is still loading
   if (loadingStatus !== "Loaded")
-    return <div className="text-center">Loading...</div>;
+    return (
+      <div className="max-w-6xl mx-auto px-4 py-10">
+        <div className="animate-pulse space-y-6">
+          <div className="h-8 w-1/3 bg-gray-200 dark:bg-gray-800 rounded"></div>
+          <div className="h-12 w-full bg-gray-200 dark:bg-gray-800 rounded-xl"></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-64 rounded-2xl bg-white/60 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10"
+              ></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
 
   /**
    * Renders a container with recipes, allowing users to explore recipes.
@@ -149,69 +150,117 @@ const RecipeSection = () => {
    * Displays recipes grouped by category with recipe cards.
    * Handles recipe selection and click events.
    */
+  const categories = Object.keys(displayedRecipes || {});
+
   return (
-    <div className="container mx-auto px-4 py-8 dark:bg-gray-900">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-red-800 dark:text-red-400">
-          Explore Recipes
-        </h1>
-        <p className="text-md text-gray-600 dark:text-gray-400 mt-2">
-          Discover your next favorite dish
-        </p>
-      </div>
+    <section className="relative">
+      <div className="absolute inset-0 page-gradient -z-10" />
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="text-center mb-8"
+        >
+          <h1 className="text-3xl md:text-4xl font-extrabold accent-text">
+            Explore Recipes
+          </h1>
+          <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mt-2">
+            Discover your next favorite dish
+          </p>
+        </motion.div>
 
-      <div className="mb-8 flex justify-center">
-        <input
-          type="text"
-          placeholder="Search for recipes..."
-          className="form-input mt-1 block w-full md:w-1/2 px-3 py-1.5 text-base font-normal text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 bg-clip-padding border border-solid border-gray-300 dark:border-gray-700 rounded transition ease-in-out m-0 focus:text-gray-700 dark:focus:text-gray-300 focus:bg-white dark:focus:bg-gray-800 focus:border-blue-600 dark:focus:border-blue-500 focus:outline-none"
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
-
-      {Object.entries(displayedRecipes).length > 0 ? (
-        Object.entries(displayedRecipes).map(([category, recipes]) => (
-          <div
-            key={category}
-            className={`${
-              theme === "dark"
-                ? categoryColorsDark[category] || "bg-gray-950" // Deeper shades
-                : categoryColors[category] || "bg-gray-100"
-            } mb-12 p-4 rounded-lg shadow-lg dark:shadow-xl dark:shadow-black/30`} // Enhanced shadow
-          >
-            <h2 className="text-2xl font-bold mb-4 capitalize text-primary dark:text-primary-light">
-              {category}
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {recipes.map((recipe) => (
-                <div
-                  key={recipe._id}
-                  className={`p-4 rounded-lg shadow-md hover:shadow-lg transition duration-300 transform hover:-translate-y-1 bg-white ${
-                    selectedRecipe === recipe
-                      ? "ring-2 ring-offset-2 ring-blue-500"
-                      : ""
-                  }`}
-                  onClick={() => handleRecipeClick(recipe, category)}
-                >
-                  <RecipeCard
-                    recipe={recipe}
-                    isExpanded={
-                      selectedRecipe && selectedRecipe._id === recipe._id
-                    }
-                    onSelect={() => handleSelectRecipe(recipe._id)}
-                    showSelectButton={!!passedCategory || fromShoppingList}
-                  />
+        {/* Toolbar */}
+        <div className="sticky top-16 z-10 mb-6">
+          <div className="rounded-2xl bg-white/60 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-3">
+            <div className="flex flex-col md:flex-row md:items-center gap-3">
+              <div className="relative flex-1">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔎</span>
+                <input
+                  type="text"
+                  placeholder="Search for recipes..."
+                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 text-gray-700 dark:text-gray-300"
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              {categories.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat) => (
+                    <a
+                      key={cat}
+                      href={`#cat-${cat.replace(/\s+/g, "-")}`}
+                      className="px-3 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-rose-500/10 to-fuchsia-500/10 text-rose-600 dark:text-rose-300 ring-1 ring-rose-500/20 hover:ring-rose-500/40 transition"
+                    >
+                      {cat}
+                    </a>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           </div>
-        ))
-      ) : (
-        <div className="text-center text-gray-800 dark:text-gray-200">
-          No recipes found.
         </div>
-      )}
-    </div>
+
+        {Object.entries(displayedRecipes).length > 0 ? (
+          Object.entries(displayedRecipes).map(([category, recipes]) => (
+            <section
+              key={category}
+              id={`cat-${category.replace(/\s+/g, "-")}`}
+              className="scroll-mt-24 mb-10"
+            >
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.4 }}
+                className="rounded-2xl bg-white/60 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-4"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl md:text-2xl font-bold capitalize accent-text">
+                    {category}
+                  </h2>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                  {recipes.map((recipe) => (
+                    <motion.div
+                      key={recipe._id}
+                      initial={{ opacity: 0, y: 8 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, amount: 0.2 }}
+                      transition={{ duration: 0.35 }}
+                    >
+                      <RecipeCard
+                        recipe={recipe}
+                        isExpanded={false}
+                        onClick={() => handleCardOpen(recipe)}
+                        onSelect={() => handleSelectRecipe(recipe._id)}
+                        showSelectButton={!!passedCategory || fromShoppingList}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            </section>
+          ))
+        ) : (
+          <div className="text-center text-gray-800 dark:text-gray-200">
+            No recipes found.
+          </div>
+        )}
+
+        {/* Details Modal */}
+        <AnimatePresence>
+          {selectedRecipe && (
+            <RecipeDetailsModal
+              key={selectedRecipe._id}
+              recipe={selectedRecipe}
+              onClose={() => setSelectedRecipe(null)}
+              showSelectButton={!!passedCategory || fromShoppingList}
+              onSelect={() => handleSelectRecipe(selectedRecipe._id)}
+            />
+          )}
+        </AnimatePresence>
+      </div>
+    </section>
   );
 };
 

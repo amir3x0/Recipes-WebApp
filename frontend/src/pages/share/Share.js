@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import { useUser } from "../../context/UserContext";
 import { shareRecipe, updateUserUploadedRecipes } from "../../services/BackendService";
 
@@ -199,12 +200,7 @@ const Share = () => {
     );
   };
 
-  const calories = {
-    total: 250,
-    protein: 15,
-    carbs: 10,
-    fat: 18,
-  };
+  // Removed unused placeholder calories object
 
   const handleShare = async () => {
     const ingredientsForShare = selectedIngredients.map((ingredient) => ({
@@ -258,34 +254,44 @@ const Share = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-gray-50 dark:bg-gray-800 shadow-lg">
-      <h1 className="flex justify-center text-4xl font-semibold text-gray-800 dark:text-gray-200 my-10">
+    <section className="max-w-6xl mx-auto px-4 py-8">
+      <motion.h1
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="text-center text-2xl md:text-3xl font-extrabold accent-text mb-6"
+      >
         Share Your Recipe
-      </h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      </motion.h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Image Upload */}
-        <div className="md:col-span-2 flex justify-center items-center">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.05 }}
+          className="md:col-span-2 rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-4 flex flex-col md:flex-row items-center"
+        >
           <input
             type="text"
             placeholder="Enter image URL"
             value={imageUrl}
             onChange={(e) => setImageUrl(e.target.value)}
-            className="input text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-md py-2 px-4 w-full md:w-1/2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            className="w-full md:w-1/2 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 text-gray-700 dark:text-gray-300"
           />
           {imageUrl && (
             <img
               src={imageUrl}
               alt="Preview"
-              className="inline-block ml-4 w-32 h-32 object-cover rounded-md"
+              className="inline-block md:ml-4 mt-4 md:mt-0 w-24 h-24 object-cover rounded-xl ring-1 ring-black/5 dark:ring-white/10"
             />
           )}
-        </div>
+        </motion.div>
 
         {/* Recipe Name */}
-        <div className="mb-6">
+        <div className="mb-5 rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-4">
           <label
-            for="recipeName"
-            className="block text-gray-700 dark:text-gray-300 text-lg font-bold mb-2"
+            htmlFor="recipeName"
+            className="block text-gray-700 dark:text-gray-300 text-base font-bold mb-2"
           >
             Recipe Name
           </label>
@@ -301,10 +307,10 @@ const Share = () => {
         </div>
 
         {/* Difficulty */}
-        <div className="mb-6">
+    <div className="mb-5 rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-4">
           <label
-            for="difficulty"
-            className="block text-gray-700 dark:text-gray-300 text-lg font-bold mb-2"
+      htmlFor="difficulty"
+      className="block text-gray-700 dark:text-gray-300 text-base font-bold mb-2"
           >
             Difficulty
           </label>
@@ -323,8 +329,8 @@ const Share = () => {
         </div>
 
         {/* Category */}
-        <div className="col-span-1 md:col-span-2">
-          <label className="block text-gray-700 dark:text-gray-300 text-lg font-bold mb-2">
+        <div className="col-span-1 md:col-span-2 rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-4">
+          <label className="block text-gray-700 dark:text-gray-300 text-base font-bold mb-2">
             Meal Category
           </label>
           <select
@@ -342,10 +348,10 @@ const Share = () => {
         </div>
 
         {/* Description */}
-        <div className="col-span-1 md:col-span-2">
+    <div className="col-span-1 md:col-span-2 rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-4">
           <label
             htmlFor="description"
-            className="block text-gray-700 dark:text-gray-300 text-lg font-bold mb-2"
+      className="block text-gray-700 dark:text-gray-300 text-base font-bold mb-2"
           >
             Description
           </label>
@@ -359,8 +365,8 @@ const Share = () => {
         </div>
 
         {/* Instructions */}
-        <div className="col-span-1 md:col-span-2">
-          <label className="block text-gray-700 dark:text-gray-300 text-lg font-bold mb-2">
+        <div className="col-span-1 md:col-span-2 rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-4">
+          <label className="block text-gray-700 dark:text-gray-300 text-base font-bold mb-2">
             Instructions
           </label>
           {instructions.map((instruction, index) => (
@@ -383,7 +389,7 @@ const Share = () => {
           <div className="flex justify-center">
             <button
               onClick={handleAddInstruction}
-              className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className="mt-2 inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-rose-500 to-fuchsia-500 shadow hover:shadow-md transition-shadow"
             >
               Add Step
             </button>
@@ -391,8 +397,8 @@ const Share = () => {
         </div>
 
         {/* Ingredient Search */}
-        <div>
-          <p className="font-semibold text-lg text-gray-700 dark:text-gray-300 mb-4">
+        <div className="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-4">
+          <p className="font-semibold text-base text-gray-700 dark:text-gray-300 mb-3">
             Search Ingredients
           </p>
           <input
@@ -416,14 +422,14 @@ const Share = () => {
         </div>
 
         {/* Selected Ingredients */}
-        <div>
-          <p className="font-semibold text-lg mb-4 text-gray-700 dark:text-gray-300">
+        <div className="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-4">
+          <p className="font-semibold text-base mb-3 text-gray-700 dark:text-gray-300">
             Selected Ingredients
           </p>
           {selectedIngredients.map((ingredient, index) => (
             <div
               key={index}
-              className="flex items-center space-x-4 mb-4 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow-md dark:shadow-sm transition ease-in-out duration-150"
+              className="flex items-center space-x-3 mb-3 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg shadow-md dark:shadow-sm transition ease-in-out duration-150"
             >
               <span className="flex-grow text-gray-900 dark:text-gray-200">
                 {ingredient.name}
@@ -458,7 +464,7 @@ const Share = () => {
                 )}
               </select>
               <button
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-150 ease-in-out"
+                className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1.5 px-3 rounded-lg text-sm transition duration-150 ease-in-out"
                 onClick={() => removeSelectedIngredient(index)}
               >
                 Delete
@@ -470,41 +476,43 @@ const Share = () => {
 
       {/* Nutritional Info */}
       <div className="flex justify-center mt-6">
-        <div className="grid grid-cols-4 gap-4 items-center text-center">
-          <div className="bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 px-4 py-2 rounded-lg shadow">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 items-center text-center w-full md:w-auto">
+          <div className="bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 px-3 py-1.5 rounded-lg shadow text-sm">
             Total Calories: {totalNutrition.total.toFixed(2)} kcal
           </div>
-          <div className="bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 px-4 py-2 rounded-lg shadow">
+          <div className="bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 px-3 py-1.5 rounded-lg shadow text-sm">
             Total Protein: {totalNutrition.protein.toFixed(2)} g
           </div>
-          <div className="bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 px-4 py-2 rounded-lg shadow">
+          <div className="bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 px-3 py-1.5 rounded-lg shadow text-sm">
             Total Carbs: {totalNutrition.carbs.toFixed(2)} g
           </div>
-          <div className="bg-red-100 dark:bg-red-800 text-red-800 dark:text-red-200 px-4 py-2 rounded-lg shadow">
+          <div className="bg-red-100 dark:bg-red-800 text-red-800 dark:text-red-200 px-3 py-1.5 rounded-lg shadow text-sm">
             Total Fat: {totalNutrition.fat.toFixed(2)} g
           </div>
         </div>
       </div>
 
       {/* Share Button */}
-      <div className="flex justify-center mt-5 text-lg border-t-2 pt-5 dark:border-gray-700">
+    <div className="flex justify-center mt-5 text-lg border-t-2 pt-5 dark:border-gray-700">
         <button
           onClick={handleShare}
-          className="transition duration-300 hover:-translate-y-1 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          className="inline-flex items-center justify-center px-5 py-2 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-emerald-500 to-teal-500 shadow hover:shadow-md transition-shadow"
         >
           Share
         </button>
       </div>
 
       {/* Message upon success or failure. */}
-      <div
-        className={`text-center font-semibold text-lg dark:text-gray-300  px-4 py-2 my-3 rounded-md shadow ${
-          shareMsg.includes("Successful") ? " text-green-800" : " text-red-800"
-        }`}
-      >
-        {shareMsg}
-      </div>
-    </div>
+      {shareMsg && (
+        <div
+          className={`text-center font-semibold text-lg dark:text-gray-300 px-4 py-2 my-3 rounded-md shadow ${
+            shareMsg.includes("Successful") ? "text-green-700 bg-green-50 dark:bg-green-900/40" : "text-rose-600 bg-rose-50 dark:bg-rose-900/40"
+          }`}
+        >
+          {shareMsg}
+        </div>
+      )}
+    </section>
   );
 };
 

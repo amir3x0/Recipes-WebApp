@@ -229,7 +229,7 @@ export default function MyYummy() {
   const handleRecipeOpen = (recipe) => setSelectedRecipe(recipe);
 
   const renderRecipeCards = (recipes) => (
-    <div className="max-w-screen-xl mx-auto px-2">
+  <div className="max-w-7xl mx-auto px-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         {recipes.map((recipe) => (
           <motion.div key={recipe._id} initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.35 }}>
@@ -297,7 +297,7 @@ export default function MyYummy() {
   }, [favoriteRecipes, favSearch, favCategory, favDifficulty, favSortBy]);
 
   const renderFavoriteList = (recipes) => (
-    <div className="max-w-20xl mx-auto px-4">
+  <div className="max-w-7xl mx-auto px-4">
       <div className="space-y-3">
         {recipes.map((recipe) => {
           const calories = Math.round(recipe?.calories?.total || 0);
@@ -358,13 +358,13 @@ export default function MyYummy() {
 
   const renderMealPlans = (mealPlans) => (
     <div className="max-w-7xl mx-auto px-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
         {mealPlans.map((meal) => (
           <div
             key={meal._id}
               className={`meal-plan-container transition duration-300 transform hover:-translate-y-1 ${
                 expandedMealId === meal._id
-                  ? "md:col-span-2 lg:col-span-2 xl:col-span-3"
+                ? "md:col-span-2 xl:col-span-2"
                   : "col-span-1"
             }`}
           >
@@ -444,10 +444,10 @@ export default function MyYummy() {
 
   if (loadingStatus === "Loading")
     return (
-      <div className="max-w-6xl mx-auto px-4 py-10">
+      <div className="max-w-7xl mx-auto px-4 py-10">
         <div className="animate-pulse space-y-6">
           <div className="h-10 w-1/2 bg-gray-200 dark:bg-gray-800 rounded"></div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="h-64 rounded-2xl bg-white/60 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10"></div>
             ))}
@@ -465,8 +465,8 @@ export default function MyYummy() {
   return (
     <section className="relative">
   <div className="absolute inset-0 page-gradient -z-10" />
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
           {/* Profile Card */}
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-6">
             <div className="flex flex-col items-center text-center">
@@ -507,7 +507,7 @@ export default function MyYummy() {
           </motion.div>
 
           {/* Content */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-3 space-y-8">
             <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }} className="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-5">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
                 <h3 className="text-xl md:text-2xl font-bold accent-text">Favorite Recipes</h3>

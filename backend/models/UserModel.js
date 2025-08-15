@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema({
   // Users can choose a theme for their profile. "light" is the default setting.
   theme: {
     type: String,
-    enum: ["light", "dark"],
+  enum: ["light", "dark", "ocean", "forest", "grape"],
     default: "light"
   },
 });

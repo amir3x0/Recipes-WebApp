@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUser } from "../context/UserContext";
+import { FaSearch, FaThLarge, FaList, FaFilter } from "react-icons/fa";
 import {
   fetchRecipeById,
   fetchMealPlansbyId,
@@ -178,6 +179,12 @@ export default function MyYummy() {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
   const [expandedMealId, setExpandedMealId] = useState(null);
+  // Favorites UI controls
+  const [favViewMode, setFavViewMode] = useState("grid"); // 'grid' | 'list'
+  const [favSortBy, setFavSortBy] = useState("title-asc"); // 'title-asc' | 'calories-asc' | 'calories-desc' | 'ingredients-desc' | 'ingredients-asc' | 'difficulty-asc'
+  const [favCategory, setFavCategory] = useState("all");
+  const [favDifficulty, setFavDifficulty] = useState("all");
+  const [favSearch, setFavSearch] = useState("");
 
   useEffect(() => {
     const initFetch = async () => {
@@ -222,7 +229,7 @@ export default function MyYummy() {
   const handleRecipeOpen = (recipe) => setSelectedRecipe(recipe);
 
   const renderRecipeCards = (recipes) => (
-    <div className="max-w-6xl mx-auto px-4">
+    <div className="max-w-screen-xl mx-auto px-2">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         {recipes.map((recipe) => (
           <motion.div key={recipe._id} initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.35 }}>
@@ -233,20 +240,132 @@ export default function MyYummy() {
     </div>
   );
 
+  // Derived data for favorites filters/sort
+  const favoriteCategories = useMemo(() => {
+    const set = new Set(
+      favoriteRecipes
+        .map((r) => r?.category)
+        .filter((c) => typeof c === "string" && c.trim().length > 0)
+    );
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [favoriteRecipes]);
+
+  const favoriteDifficulties = useMemo(() => {
+    const set = new Set(
+      favoriteRecipes
+        .map((r) => r?.difficulty)
+        .filter((d) => typeof d === "string" && d.trim().length > 0)
+    );
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [favoriteRecipes]);
+
+  const displayedFavorites = useMemo(() => {
+    const q = favSearch.trim().toLowerCase();
+    let list = favoriteRecipes.filter((r) => {
+      const title = (r?.title || "").toLowerCase();
+      const matchesQuery = q === "" || title.includes(q);
+      const matchesCat = favCategory === "all" || (r?.category || "") === favCategory;
+      const matchesDiff = favDifficulty === "all" || (r?.difficulty || "") === favDifficulty;
+      return matchesQuery && matchesCat && matchesDiff;
+    });
+
+    const getIngCount = (r) => (Array.isArray(r?.ingredients) ? r.ingredients.length : 0);
+    const getCalories = (r) => Math.round(r?.calories?.total || 0);
+
+    switch (favSortBy) {
+      case "calories-asc":
+        list = list.sort((a, b) => getCalories(a) - getCalories(b));
+        break;
+      case "calories-desc":
+        list = list.sort((a, b) => getCalories(b) - getCalories(a));
+        break;
+      case "ingredients-asc":
+        list = list.sort((a, b) => getIngCount(a) - getIngCount(b));
+        break;
+      case "ingredients-desc":
+        list = list.sort((a, b) => getIngCount(b) - getIngCount(a));
+        break;
+      case "difficulty-asc":
+        list = list.sort((a, b) => (a?.difficulty || "").localeCompare(b?.difficulty || ""));
+        break;
+      case "title-asc":
+      default:
+        list = list.sort((a, b) => (a?.title || "").localeCompare(b?.title || ""));
+        break;
+    }
+    return list;
+  }, [favoriteRecipes, favSearch, favCategory, favDifficulty, favSortBy]);
+
+  const renderFavoriteList = (recipes) => (
+    <div className="max-w-20xl mx-auto px-4">
+      <div className="space-y-3">
+        {recipes.map((recipe) => {
+          const calories = Math.round(recipe?.calories?.total || 0);
+          const ingredientsCount = Array.isArray(recipe?.ingredients) ? recipe.ingredients.length : 0;
+          return (
+            <motion.div
+              key={recipe._id}
+              initial={{ opacity: 0, y: 8 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.3 }}
+              className="flex items-center gap-3 p-3 rounded-xl bg-white/70 dark:bg-gray-900/60 ring-1 ring-black/5 dark:ring-white/10 shadow hover:shadow-md cursor-pointer"
+              onClick={() => handleRecipeOpen(recipe)}
+            >
+              <img
+                src={recipe.picture}
+                alt={recipe.title}
+                className="h-16 w-16 md:h-20 md:w-20 rounded-lg object-cover flex-shrink-0"
+                onError={(e) => {
+                  e.currentTarget.src = "https://via.placeholder.com/80";
+                }}
+              />
+              <div className="flex-1 min-w-0">
+                <h4 className="text-sm md:text-base font-semibold text-gray-900 dark:text-gray-100 truncate">
+                  {recipe.title}
+                </h4>
+                <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px]">
+                  {recipe.category && (
+                    <span className="px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800 ring-1 ring-black/5 dark:ring-white/10 text-gray-800 dark:text-gray-200">
+                      {recipe.category}
+                    </span>
+                  )}
+                  {recipe.difficulty && (
+                    <span className="px-2 py-1 rounded-full bg-gradient-to-r from-amber-400/20 to-fuchsia-400/20 text-amber-700 dark:text-amber-300 ring-1 ring-amber-400/30">
+                      {recipe.difficulty}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="text-right text-[11px] md:text-xs text-gray-600 dark:text-gray-300">
+                <div className="px-2 py-1 rounded bg-blue-50 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200 ring-1 ring-blue-200/50 inline-block">
+                  {calories} kcal
+                </div>
+                <div className="mt-1 px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 ring-1 ring-black/5 dark:ring-white/10 inline-block">
+                  {ingredientsCount} ingredients
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
   const handleExpandChange = (mealId, isExpanded) => {
     setExpandedMealId(isExpanded ? mealId : null);
   };
 
   const renderMealPlans = (mealPlans) => (
-    <div className="max-w-6xl mx-auto px-4">
+    <div className="max-w-7xl mx-auto px-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         {mealPlans.map((meal) => (
           <div
             key={meal._id}
-            className={`meal-plan-container transition duration-300 transform hover:-translate-y-1 ${
-              expandedMealId === meal._id
-                ? "sm:col-span-2 lg:col-span-3 xl:col-span-4"
-                : "col-span-1"
+              className={`meal-plan-container transition duration-300 transform hover:-translate-y-1 ${
+                expandedMealId === meal._id
+                  ? "md:col-span-2 lg:col-span-2 xl:col-span-3"
+                  : "col-span-1"
             }`}
           >
             <MealCard meal={meal} onExpandChange={handleExpandChange} />
@@ -390,8 +509,94 @@ export default function MyYummy() {
           {/* Content */}
           <div className="lg:col-span-2 space-y-8">
             <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }} className="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-5">
-              <h3 className="text-xl md:text-2xl font-bold mb-4 accent-text">Favorite Recipes</h3>
-              {renderRecipeCards(favoriteRecipes)}
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+                <h3 className="text-xl md:text-2xl font-bold accent-text">Favorite Recipes</h3>
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* Search */}
+                  <div className="relative">
+                    <FaSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                      type="text"
+                      value={favSearch}
+                      onChange={(e) => setFavSearch(e.target.value)}
+                      placeholder="Search favorites..."
+                      className="pl-8 pr-3 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-rose-400 text-gray-700 dark:text-gray-300"
+                    />
+                  </div>
+                  {/* Category filter */}
+                  <div className="flex items-center gap-1">
+                    <FaFilter className="text-gray-400" />
+                    <select
+                      aria-label="Filter by category"
+                      value={favCategory}
+                      onChange={(e) => setFavCategory(e.target.value)}
+                      className="px-2 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300"
+                    >
+                      <option value="all">All Categories</option>
+                      {favoriteCategories.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {/* Difficulty filter */}
+                  <select
+                    aria-label="Filter by difficulty"
+                    value={favDifficulty}
+                    onChange={(e) => setFavDifficulty(e.target.value)}
+                    className="px-2 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300"
+                  >
+                    <option value="all">All Difficulty</option>
+                    {favoriteDifficulties.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                  {/* Sort */}
+                  <select
+                    aria-label="Sort favorites"
+                    value={favSortBy}
+                    onChange={(e) => setFavSortBy(e.target.value)}
+                    className="px-2 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300"
+                  >
+                    <option value="title-asc">Title (A-Z)</option>
+                    <option value="calories-asc">Calories (Low-High)</option>
+                    <option value="calories-desc">Calories (High-Low)</option>
+                    <option value="ingredients-asc">Ingredients (Few-Many)</option>
+                    <option value="ingredients-desc">Ingredients (Many-Few)</option>
+                    <option value="difficulty-asc">Difficulty (A-Z)</option>
+                  </select>
+                  {/* View toggle */}
+                  <div className="inline-flex rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10">
+                    <button
+                      type="button"
+                      aria-label="Grid view"
+                      onClick={() => setFavViewMode("grid")}
+                      className={`px-2 py-1.5 text-sm ${favViewMode === "grid" ? "bg-emerald-500 text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"}`}
+                    >
+                      <FaThLarge />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="List view"
+                      onClick={() => setFavViewMode("list")}
+                      className={`px-2 py-1.5 text-sm ${favViewMode === "list" ? "bg-emerald-500 text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"}`}
+                    >
+                      <FaList />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {displayedFavorites.length === 0 ? (
+                <div className="max-w-6xl mx-auto px-4">
+                  <div className="rounded-xl bg-gray-50 dark:bg-gray-800 p-6 text-center text-gray-600 dark:text-gray-300 ring-1 ring-black/5 dark:ring-white/10">
+                    No favorite recipes match your filters.
+                  </div>
+                </div>
+              ) : favViewMode === "list" ? (
+                renderFavoriteList(displayedFavorites)
+              ) : (
+                renderRecipeCards(displayedFavorites)
+              )}
             </motion.div>
 
             <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }} className="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-xl p-5">

@@ -20,59 +20,28 @@ export default function Footer() {
 
             <div className="container mx-auto px-6">
                 <div className="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur shadow-xl ring-1 ring-black/5 dark:ring-white/10 overflow-hidden">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-10 p-10">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10 p-10">
                         <motion.div variants={fadeIn} initial="hidden" whileInView="show" viewport={{ once: true }}>
                             <Link to="/" className="inline-flex items-center gap-2 group">
                                 <span className="text-2xl font-extrabold bg-gradient-to-r from-rose-500 via-orange-400 to-fuchsia-500 bg-clip-text text-transparent">
                                     Yummy
                                 </span>
                                 <span className="text-xs px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-500 border border-rose-500/20">
-                                    Braude
+                                    2025
                                 </span>
                             </Link>
                             <p className="mt-4 text-sm leading-6 text-gray-500 dark:text-gray-400">
-                                Crafted with a love for great food as part of the Braude Web Course. Explore recipes, plan meals, and share your creations.
+                                Crafted with a love for great food as part of Web learning. Explore recipes, plan meals, and share your creations.
                             </p>
                         </motion.div>
 
-                        <motion.div variants={fadeIn} initial="hidden" whileInView="show" viewport={{ once: true }} className="md:col-span-1">
-                            <h3 className="text-sm font-semibold tracking-wider text-gray-900 dark:text-white">Quick Links</h3>
-                            <ul className="mt-4 space-y-2 text-sm">
-                                <li>
-                                    <Link to="/" className="hover:text-rose-500 transition-colors">Home</Link>
-                                </li>
-                                <li>
-                                    <Link to="/Recipes" className="hover:text-rose-500 transition-colors">Recipes</Link>
-                                </li>
-                                <li>
-                                    <Link to="/Plan" className="hover:text-rose-500 transition-colors">Plan Meal</Link>
-                                </li>
-                                <li>
-                                    <Link to="/Share" className="hover:text-rose-500 transition-colors">Share</Link>
-                                </li>
-                                <li>
-                                    <Link to="/Shopping" className="hover:text-rose-500 transition-colors">Shopping</Link>
-                                </li>
-                                <li>
-                                    <Link to="/MyYummy" className="hover:text-rose-500 transition-colors">MyYummy</Link>
-                                </li>
-                            </ul>
-                        </motion.div>
+                        
 
                         <motion.div variants={fadeIn} initial="hidden" whileInView="show" viewport={{ once: true }} className="md:col-span-1">
                             <h3 className="text-sm font-semibold tracking-wider text-gray-900 dark:text-white">Contact</h3>
                             <ul className="mt-4 space-y-2 text-sm">
                                 <li>
                                     <a className="hover:text-rose-500 transition-colors" href="mailto:Amir.Mishayev@e.braude.ac.il">Amir.Mishayev@e.braude.ac.il</a>
-                                </li>
-                                <li>
-                                    <a className="hover:text-rose-500 transition-colors" href="mailto:Dana.Soudry@e.braude.ac.il">Dana.Soudry@e.braude.ac.il</a>
-                                </li>
-                                <li>
-                                    <a className="hover:text-rose-500 transition-colors" href="mailto:lital.leschinsky@e.braude.ac.il">lital.leschinsky@e.braude.ac.il</a>
-                                </li>
-                                <li>
-                                    <a className="hover:text-rose-500 transition-colors" href="mailto:Michael.Trifonov@e.braude.ac.il">Michael.Trifonov@e.braude.ac.il</a>
                                 </li>
                             </ul>
                         </motion.div>
@@ -118,7 +87,7 @@ export default function Footer() {
 
                     <div className="border-t border-gray-200/60 dark:border-white/10 px-10 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                            © {year} Yummy • Built for Braude Web Course • 12/02/2024
+                            © {year} Yummy • All rights reserved.
                         </p>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
                             <span className="mr-2">Made with</span>

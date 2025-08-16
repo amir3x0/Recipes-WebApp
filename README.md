@@ -12,6 +12,21 @@ This project is a full-stack web application that allows users to search for rec
 - Real-time image optimization with ImageKit
 - Nutritional information and ingredient details powered by Spoonacular
 
+
+## Screenshots
+
+Here are some visuals of key pages of the application:
+
+![Profile Page](frontend/Assets/Profile-Page.png)
+
+![Recipe Detail Page](frontend/Assets/Recipe-detail.png)
+
+![Shopping List](frontend/Assets/Shopping-List.png)
+
+## Demo
+
+_A demo video showing the app in action will be added soon._
+
 ## Technology Stack
 
 - **Frontend**: React, Axios

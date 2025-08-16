@@ -23,16 +23,16 @@
 .theme-ocean {
 	--accent-from: #06b6d4; /* cyan-500 */
 	--accent-to: #3b82f6;   /* blue-500 */
-	--page-grad-from: #ecfeff; /* cyan-50 */
-	--page-grad-via: #eff6ff;  /* blue-50 */
-	--page-grad-to: #ffffff;
+	--page-grad-from: #46d1d8; /* cyan-50 */
+	--page-grad-via: #7a90ad;  /* blue-50 */
+	--page-grad-to: #55caf5;
 }
 
 .theme-forest {
 	--accent-from: #10b981; /* emerald-500 */
 	--accent-to: #84cc16;   /* lime-500 */
 	--page-grad-from: #ecfdf5; /* emerald-50 */
-	--page-grad-via: #f7fee7;  /* lime-50 */
+	--page-grad-via: #c6e877;  /* lime-50 */
 	--page-grad-to: #ffffff;
 }
 
@@ -40,7 +40,7 @@
 	--accent-from: #a78bfa; /* violet-400 */
 	--accent-to: #f472b6;   /* pink-400 */
 	--page-grad-from: #faf5ff; /* violet-50 */
-	--page-grad-via: #fdf2f8;  /* pink-50 */
+	--page-grad-via: #f188c2;  /* pink-50 */
 	--page-grad-to: #ffffff;
 }
 
